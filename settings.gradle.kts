@@ -7,4 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "PermissionLauncher"
 include(":permissionlauncher-sample")
-include(":permissionlauncher")
+include(":permissionlauncher-ktx")
