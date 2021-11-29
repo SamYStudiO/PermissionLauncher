@@ -21,7 +21,7 @@ allprojects {
 ```
 and change versions:
 ```groovy
-implementation 'net.samystudio.permissionlauncher:permissionlauncher:0.1-SNAPSHOT'
+implementation 'net.samystudio.permissionlauncher:permissionlauncher-ktx:0.1-SNAPSHOT'
 ```
 
 Publishing
