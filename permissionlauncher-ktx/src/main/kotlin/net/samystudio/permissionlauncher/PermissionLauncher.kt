@@ -9,7 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
 /**
- * Create a permission launcher for a unique permission. For multiple permissions use
+ * A permission launcher for a unique permission. For multiple permissions use
  * [MultiplePermissionsLauncher].
  *
  * @see ActivityResultContracts.RequestPermission

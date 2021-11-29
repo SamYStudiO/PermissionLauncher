@@ -4,6 +4,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 
 /**
+ * Permission launcher for a unique permission from a [Fragment].
+ *
  * @See PermissionLauncher
  */
 class FragmentPermissionLauncher(

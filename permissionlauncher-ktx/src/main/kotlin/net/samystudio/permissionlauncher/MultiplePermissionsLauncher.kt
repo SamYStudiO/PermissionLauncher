@@ -7,7 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
 /**
- * Create a permission launcher for multiples permissions.
+ * A permission launcher for multiples permissions.
  *
  * @see ActivityResultContracts.RequestMultiplePermissions
  */

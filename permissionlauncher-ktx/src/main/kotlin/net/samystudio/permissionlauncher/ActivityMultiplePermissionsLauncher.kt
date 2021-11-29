@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 
 /**
+ * Permission launcher for a set of permissions from a [ComponentActivity].
+ *
  * @See MultiplePermissionsLauncher
  */
 class ActivityMultiplePermissionsLauncher(

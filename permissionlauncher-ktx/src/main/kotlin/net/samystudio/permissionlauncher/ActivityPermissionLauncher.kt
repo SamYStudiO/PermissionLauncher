@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 
 /**
+ * Permission launcher for a unique permission from a [ComponentActivity].
+ *
  * @See PermissionLauncher
  */
 class ActivityPermissionLauncher(
