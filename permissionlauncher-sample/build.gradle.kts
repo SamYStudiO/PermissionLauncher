@@ -48,4 +48,6 @@ dependencies {
     debug()
     test()
     androidTest()
+
+    implementation(Dependencies.material)
 }

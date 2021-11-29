@@ -41,7 +41,6 @@ fun DependencyHandler.base() {
     implementation(Dependencies.core_ktx)
     implementation(Dependencies.activity)
     implementation(Dependencies.fragment)
-    implementation(Dependencies.material)
 }
 
 
