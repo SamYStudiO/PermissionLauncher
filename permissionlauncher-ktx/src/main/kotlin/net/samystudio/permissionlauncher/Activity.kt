@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 
 /**
  * Convenient way to get if a [permission] is granted from an [Activity].
@@ -48,7 +47,7 @@ fun ComponentActivity.createPermissionLauncher(
  */
 fun ComponentActivity.createMultiplePermissionsLauncher(
     permissions: Set<String>,
-    maxSdks: Set<Pair<String,Int>>? = null,
+    maxSdks: Set<Pair<String, Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((permissions: Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,

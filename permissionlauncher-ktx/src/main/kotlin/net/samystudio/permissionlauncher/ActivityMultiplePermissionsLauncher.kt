@@ -12,7 +12,7 @@ import androidx.core.app.ActivityCompat
 class ActivityMultiplePermissionsLauncher(
     private val activity: ComponentActivity,
     permissions: Set<String>,
-    maxSdks: Set<Pair<String,Int>>? = null,
+    maxSdks: Set<Pair<String, Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,

@@ -21,7 +21,7 @@ abstract class MultiplePermissionsLauncher(
      * [Build.VERSION_CODES.P]. If the permission from [Pair.first] is not present from
      * [permissions] set it will be ignore.
      */
-    private val maxSdks: Set<Pair<String,Int>>? = null,
+    private val maxSdks: Set<Pair<String, Int>>? = null,
     /**
      * A optional rationale callback called everytime this launcher is launched and a rationale
      * should be present to user.
@@ -36,13 +36,13 @@ abstract class MultiplePermissionsLauncher(
      */
     private val globalGranted: (() -> Unit)? = null,
 ) {
-    private var permissionsWithMaxSdk : Set<Pair<String, Int>>? = null
+    private var permissionsWithMaxSdk: Set<Pair<String, Int>>? = null
     private var localRationale: ((Set<String>, RationalePermissionLauncher) -> Boolean)? =
         null
     private var localDenied: ((Set<String>) -> Boolean)? = null
     private var localGranted: (() -> Boolean)? = null
     protected abstract val launcher: ActivityResultLauncher<Array<String>>
-    protected val requiredPermission = permissions.filterNot { permission->
+    protected val requiredPermission = permissions.filterNot { permission ->
         maxSdks?.find { it.first == permission && Build.VERSION.SDK_INT > it.second } != null
     }.toSet()
     protected val activityResultCallback = ActivityResultCallback<Map<String, Boolean>> { map ->

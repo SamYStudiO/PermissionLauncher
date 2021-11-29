@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 class FragmentMultiplePermissionsLauncher(
     private val fragment: Fragment,
     permissions: Set<String>,
-    maxSdks: Set<Pair<String,Int>>? = null,
+    maxSdks: Set<Pair<String, Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,

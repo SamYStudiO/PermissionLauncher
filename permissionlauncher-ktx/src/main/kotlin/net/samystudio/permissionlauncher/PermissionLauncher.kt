@@ -44,7 +44,6 @@ abstract class PermissionLauncher(
             internalGranted()
         else
             internalDenied()
-
     }
     private val rationalePermissionLauncher = RationalePermissionLauncher(
         ::internalLaunch,
