@@ -83,7 +83,7 @@ abstract class MultiplePermissionsLauncher(
             hasPermissions() ->
                 internalGranted()
             rationales.isNotEmpty() ->
-                internalRational(rationales)
+                internalRationale(rationales)
             else ->
                 internalLaunch()
         }
@@ -96,7 +96,7 @@ abstract class MultiplePermissionsLauncher(
         launcher.launch(permissions.toTypedArray())
     }
 
-    private fun internalRational(permissions: Set<String>) {
+    private fun internalRationale(permissions: Set<String>) {
         val rationaleMultiplePermissionsLauncher = RationalePermissionLauncher(
             ::internalLaunch
         ) { internalDenied(permissions) }

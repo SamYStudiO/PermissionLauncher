@@ -76,7 +76,7 @@ abstract class PermissionLauncher(
             hasPermission() || (maxSdk != null && Build.VERSION.SDK_INT > maxSdk) ->
                 internalGranted()
             shouldShowRequestPermissionRationale() ->
-                internalRational()
+                internalRationale()
             else ->
                 internalLaunch()
         }
@@ -89,7 +89,7 @@ abstract class PermissionLauncher(
         launcher.launch(permission)
     }
 
-    private fun internalRational() {
+    private fun internalRationale() {
         localRationale?.invoke(rationalePermissionLauncher).let {
             if (it != false)
                 globalRationale?.invoke(rationalePermissionLauncher)
