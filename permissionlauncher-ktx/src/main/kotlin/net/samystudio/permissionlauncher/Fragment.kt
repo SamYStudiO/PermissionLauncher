@@ -49,12 +49,14 @@ fun Fragment.createPermissionLauncher(
  */
 fun Fragment.createMultiplePermissionsLauncher(
     permissions: Set<String>,
+    maxSdks: Set<Pair<String, Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ): MultiplePermissionsLauncher = FragmentMultiplePermissionsLauncher(
     this,
     permissions,
+    maxSdks,
     globalRationale,
     globalDenied,
     globalGranted,

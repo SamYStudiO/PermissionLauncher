@@ -12,13 +12,13 @@ import androidx.core.app.ActivityCompat
 class ActivityPermissionLauncher(
     private val activity: ComponentActivity,
     permission: String,
-    maxSdkInt: Int? = null,
+    maxSdk: Int? = null,
     globalRationale: ((RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: (() -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ) : PermissionLauncher(
     permission,
-    maxSdkInt,
+    maxSdk,
     globalRationale,
     globalDenied,
     globalGranted,

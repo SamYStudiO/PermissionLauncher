@@ -20,7 +20,7 @@ abstract class PermissionLauncher(
      * A maximum Sdk version this permission should be launched, for example asking
      * [Manifest.permission.WRITE_EXTERNAL_STORAGE] may be useless after [Build.VERSION_CODES.P].
      */
-    private val maxSdkInt: Int? = null,
+    private val maxSdk: Int? = null,
     /**
      * A optional rationale callback called everytime this launcher is launched and a rationale
      * should be present to user.
@@ -74,7 +74,7 @@ abstract class PermissionLauncher(
         this.localGranted = granted
 
         when {
-            hasPermission() || (maxSdkInt != null && Build.VERSION.SDK_INT > maxSdkInt) ->
+            hasPermission() || (maxSdk != null && Build.VERSION.SDK_INT > maxSdk) ->
                 internalGranted()
             shouldShowRequestPermissionRationale() ->
                 internalRational()

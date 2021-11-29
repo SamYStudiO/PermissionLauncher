@@ -11,13 +11,13 @@ import androidx.fragment.app.Fragment
 class FragmentPermissionLauncher(
     private val fragment: Fragment,
     permission: String,
-    maxSdkInt: Int? = null,
+    maxSdk: Int? = null,
     globalRationale: ((RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: (() -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ) : PermissionLauncher(
     permission,
-    maxSdkInt,
+    maxSdk,
     globalRationale,
     globalDenied,
     globalGranted,

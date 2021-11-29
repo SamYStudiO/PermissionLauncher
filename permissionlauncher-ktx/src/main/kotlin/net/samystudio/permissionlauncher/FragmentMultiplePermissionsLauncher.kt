@@ -11,11 +11,13 @@ import androidx.fragment.app.Fragment
 class FragmentMultiplePermissionsLauncher(
     private val fragment: Fragment,
     permissions: Set<String>,
+    maxSdks: Set<Pair<String,Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ) : MultiplePermissionsLauncher(
     permissions,
+    maxSdks,
     globalRationale,
     globalDenied,
     globalGranted,
@@ -30,5 +32,5 @@ class FragmentMultiplePermissionsLauncher(
         permissions.filter { fragment.shouldShowRequestPermissionRationale(it) }.toSet()
 
     override fun hasPermissions() =
-        fragment.hasPermissions(*permissions.toTypedArray())
+        fragment.hasPermissions(*requiredPermission.toTypedArray())
 }

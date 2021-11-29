@@ -48,12 +48,14 @@ fun ComponentActivity.createPermissionLauncher(
  */
 fun ComponentActivity.createMultiplePermissionsLauncher(
     permissions: Set<String>,
+    maxSdks: Set<Pair<String,Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((permissions: Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ): MultiplePermissionsLauncher = ActivityMultiplePermissionsLauncher(
     this,
     permissions,
+    maxSdks,
     globalRationale,
     globalDenied,
     globalGranted,

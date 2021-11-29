@@ -12,11 +12,13 @@ import androidx.core.app.ActivityCompat
 class ActivityMultiplePermissionsLauncher(
     private val activity: ComponentActivity,
     permissions: Set<String>,
+    maxSdks: Set<Pair<String,Int>>? = null,
     globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
     globalDenied: ((Set<String>) -> Unit)? = null,
     globalGranted: (() -> Unit)? = null,
 ) : MultiplePermissionsLauncher(
     permissions,
+    maxSdks,
     globalRationale,
     globalDenied,
     globalGranted,
@@ -33,5 +35,5 @@ class ActivityMultiplePermissionsLauncher(
         }.toSet()
 
     override fun hasPermissions() =
-        activity.hasPermissions(*permissions.toTypedArray())
+        activity.hasPermissions(*requiredPermission.toTypedArray())
 }

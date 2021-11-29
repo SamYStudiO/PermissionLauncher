@@ -2,6 +2,8 @@
 
 package net.samystudio.permissionlauncher
 
+import android.Manifest
+import android.os.Build
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +15,13 @@ import androidx.activity.result.contract.ActivityResultContracts
  */
 abstract class MultiplePermissionsLauncher(
     val permissions: Set<String>,
+    /**
+     * A maximum Sdk version as [Pair.second] for each permission as [Pair.first], for example
+     * asking [Manifest.permission.WRITE_EXTERNAL_STORAGE] may be useless after
+     * [Build.VERSION_CODES.P]. If the permission from [Pair.first] is not present from
+     * [permissions] set it will be ignore.
+     */
+    private val maxSdks: Set<Pair<String,Int>>? = null,
     /**
      * A optional rationale callback called everytime this launcher is launched and a rationale
      * should be present to user.
@@ -27,11 +36,15 @@ abstract class MultiplePermissionsLauncher(
      */
     private val globalGranted: (() -> Unit)? = null,
 ) {
+    private var permissionsWithMaxSdk : Set<Pair<String, Int>>? = null
     private var localRationale: ((Set<String>, RationalePermissionLauncher) -> Boolean)? =
         null
     private var localDenied: ((Set<String>) -> Boolean)? = null
     private var localGranted: (() -> Boolean)? = null
     protected abstract val launcher: ActivityResultLauncher<Array<String>>
+    protected val requiredPermission = permissions.filterNot { permission->
+        maxSdks?.find { it.first == permission && Build.VERSION.SDK_INT > it.second } != null
+    }.toSet()
     protected val activityResultCallback = ActivityResultCallback<Map<String, Boolean>> { map ->
         if (map.filter { !it.value }.isEmpty()) {
             internalGranted()
