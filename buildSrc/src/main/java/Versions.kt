@@ -18,13 +18,10 @@ object Versions {
     const val core = "1.7.0"
     const val activity = "1.3.1"
     const val fragment = "1.3.6"
-    const val preference = "1.1.1"
-    const val datastore = "1.0.0"
     const val material = "1.5.0-alpha05"
 
     // debug
     const val timber = "5.0.1"
-    const val leakcanary = "2.7"
 
     // test
     const val junit = "4.13.2"

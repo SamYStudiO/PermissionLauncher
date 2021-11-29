@@ -8,6 +8,7 @@ object Dependencies {
     const val core_ktx = "androidx.core:core-ktx:${Versions.core}"
     const val activity = "androidx.activity:activity-ktx:${Versions.activity}"
     const val fragment = "androidx.fragment:fragment-ktx:${Versions.fragment}"
+    const val material = "com.google.android.material:material:${Versions.material}"
 
     // debug
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
@@ -40,6 +41,7 @@ fun DependencyHandler.base() {
     implementation(Dependencies.core_ktx)
     implementation(Dependencies.activity)
     implementation(Dependencies.fragment)
+    implementation(Dependencies.material)
 }
 
 
