@@ -15,7 +15,7 @@ button.setOnClickListener {
                 // From your rationale call either : 
                 // + rationalePermissionLauncher.cancel() to cancel request
                 // + rationalePermissionLauncher.deny() to call denied callback
-                // + rationalePermissionLauncher.accept to continue process and show Android dialog for permission
+                // + rationalePermissionLauncher.accept() to continue process and show Android dialog for permission
             },
             deniedCallback = { permission, neverAskAgain ->
                 // handle denied
@@ -39,7 +39,7 @@ button.setOnClickListener {
                 // From your rationale call either : 
                 // + rationalePermissionLauncher.cancel() to cancel request
                 // + rationalePermissionLauncher.deny() to call denied callback
-                // + rationalePermissionLauncher.accept to continue process and show Android dialog for permissions
+                // + rationalePermissionLauncher.accept() to continue process and show Android dialog for permissions
             },
             deniedCallback = { permissions, neverAskAgain ->
                 // handle denied
@@ -66,7 +66,7 @@ button.setOnClickListener {
                     // From your rationale call either : 
                     // + rationalePermissionLauncher.cancel() to cancel request
                     // + rationalePermissionLauncher.deny() to call denied callback
-                    // + rationalePermissionLauncher.accept to continue process and show Android dialog for permissions
+                    // + rationalePermissionLauncher.accept() to continue process and show Android dialog for permissions
                 },
                 deniedCallback = { permissions, neverAskAgain ->
                     // handle denied
