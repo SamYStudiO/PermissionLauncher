@@ -1,11 +1,11 @@
-PermissionLauncher
-==================
+Permission Launcher
+===================
 Android lightweight library to perform permissions request the right way using [ActivityResultCallback](https://developer.android.com/reference/androidx/activity/result/ActivityResultCallback), Check how to request permission from [documentation](https://developer.android.com/training/permissions/requesting#request-permission).
 
 Usage
 -----
 **Unique permission request**
-```koltin
+```kotlin
 private val contactPermissionLauncher = createPermissionLauncher(Manifest.permission.READ_CONTACTS)
 //...
 button.setOnClickListener {
@@ -27,7 +27,7 @@ button.setOnClickListener {
 ````
 
 **Multiple permissions with at least one permission required**
-```koltin
+```kotlin
 private val locationPermissionLauncher = createMultiplePermissionsLauncher(
         anyOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     )
@@ -51,7 +51,7 @@ button.setOnClickListener {
 ````
 
 **Multiple permissions with all permissions required and one required until Android SDK 28**
-```koltin
+```kotlin
 private val cameraPermissionLauncher = createMultiplePermissionsLauncher(
         allOf(
             Manifest.permission.CAMERA,
@@ -91,7 +91,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        ...
+        //...
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 }
