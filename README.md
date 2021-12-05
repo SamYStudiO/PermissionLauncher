@@ -2,6 +2,83 @@ PermissionLauncher
 ==================
 Android lightweight library to perform permissions request the right way using [ActivityResultCallback](https://developer.android.com/reference/androidx/activity/result/ActivityResultCallback), Check how to request permission from [documentation](https://developer.android.com/training/permissions/requesting#request-permission).
 
+Usage
+-----
+**Unique permission request**
+```koltin
+private val contactPermissionLauncher = createPermissionLauncher(Manifest.permission.READ_CONTACTS)
+//...
+button.setOnClickListener {
+        contactPermissionLauncher.launch(
+            rationaleCallback = { permission, rationalePermissionLauncher ->
+                showRationale(permission, rationalePermissionLauncher)
+                // From your rationale call either : 
+                // + rationalePermissionLauncher.cancel() to cancel request
+                // + rationalePermissionLauncher.deny() to call denied callback
+                // + rationalePermissionLauncher.accept to continue process and show Android dialog for permission
+            },
+            deniedCallback = { permission, neverAskAgain ->
+                // handle denied
+            }
+        ) {
+            // handle permission granted
+        }
+    }
+````
+
+**Multiple permissions with at least one permission required**
+```koltin
+private val locationPermissionLauncher = createMultiplePermissionsLauncher(
+        anyOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    )
+//...
+button.setOnClickListener {
+        locationPermissionLauncher.launch(
+            rationaleCallback = { permissions, rationalePermissionLauncher ->
+                showRationale(permissions, rationalePermissionLauncher)
+                // From your rationale call either : 
+                // + rationalePermissionLauncher.cancel() to cancel request
+                // + rationalePermissionLauncher.deny() to call denied callback
+                // + rationalePermissionLauncher.accept to continue process and show Android dialog for permissions
+            },
+            deniedCallback = { permissions, neverAskAgain ->
+                // handle denied
+            }
+        ) {
+           // handle permissions granted
+        }
+    }
+````
+
+**Multiple permissions with all permissions required and one required until Android SDK 28**
+```koltin
+private val cameraPermissionLauncher = createMultiplePermissionsLauncher(
+        allOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P
+        )
+    )
+//...
+button.setOnClickListener {
+        cameraPermissionLauncher.launch(
+                rationaleCallback = { permissions, rationalePermissionLauncher ->
+                    showRationale(permissions, rationalePermissionLauncher)
+                    // From your rationale call either : 
+                    // + rationalePermissionLauncher.cancel() to cancel request
+                    // + rationalePermissionLauncher.deny() to call denied callback
+                    // + rationalePermissionLauncher.accept to continue process and show Android dialog for permissions
+                },
+                deniedCallback = { permissions, neverAskAgain ->
+                    // handle denied
+                }
+            ) {
+                // handle permissions granted
+            }
+    }
+````
+
+Check [sample](https://github.com/SamYStudiO/PermissionLauncher/tree/master/permissionlauncher-sample) for full usage.
+
 Download
 --------
 YET TO BE RELEASED (WORK IN PROGRESS)
