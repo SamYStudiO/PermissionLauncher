@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 
 /**
  * Convenient way to get if a [permission] is granted from an [Activity].
@@ -23,7 +22,7 @@ fun Activity.hasPermission(permission: String) =
         this,
         permission
     ) == PackageManager.PERMISSION_GRANTED ||
-            permission.isUselessPermission()
+        permission.isUselessPermission()
 
 /**
  * Convenient way to get if a set of permissions are granted from an [Activity].

@@ -2,8 +2,6 @@
 
 package net.samystudio.permissionlauncher
 
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import net.samystudio.permissionlauncher.MultiplePermissionsLauncher.Contract
 
@@ -21,21 +19,6 @@ abstract class MultiplePermissionsLauncher(
 ) {
     private var deniedCallback: ((permissions: Set<String>) -> Unit)? = null
     private var grantedCallback: ((permissions: Set<String>) -> Unit)? = null
-    protected abstract val launcher: ActivityResultLauncher<Array<String>>
-    protected val activityResultCallback = ActivityResultCallback<Map<String, Boolean>> { map ->
-        when (contract) {
-            is Contract.AllOf ->
-                if (hasAllPermissions())
-                    internalGranted(map.keys.toSet())
-                else
-                    internalDenied(map.filter { !it.value }.keys.toSet())
-            is Contract.AnyOf ->
-                if (hasAnyPermissions())
-                    internalGranted(map.filter { it.value }.keys.toSet())
-                else
-                    internalDenied(map.keys.toSet())
-        }
-    }
     private var rationalePermissionLauncher: RationalePermissionLauncher? = null
     val permissions = contract.permissions
 
@@ -65,8 +48,10 @@ abstract class MultiplePermissionsLauncher(
 
         when {
             hasPermissions ->
-                internalGranted(contract.rawPermissions.filter { hasPermission(it) }
-                    .map { it.normalizePermission() }.toSet())
+                internalGranted(
+                    contract.rawPermissions.filter { hasPermission(it) }
+                        .map { it.normalizePermission() }.toSet()
+                )
             rationales.isNotEmpty() -> {
                 rationalePermissionLauncher = RationalePermissionLauncher(
                     ::internalCancelled,
@@ -83,9 +68,31 @@ abstract class MultiplePermissionsLauncher(
     protected abstract fun hasAllPermissions(): Boolean
     protected abstract fun hasAnyPermissions(): Boolean
     protected abstract fun shouldShowRequestPermissionRationales(): Set<String>
+    protected abstract fun launch()
+
+    protected fun handleResult(map: Map<String, Boolean>) {
+        when (contract) {
+            is Contract.AllOf ->
+                if (hasAllPermissions())
+                    internalGranted(
+                        contract.rawPermissions.filter { hasPermission(it) }
+                            .map { it.normalizePermission() }.toSet()
+                    )
+                else
+                    internalDenied(map.filter { !it.value }.keys.toSet())
+            is Contract.AnyOf ->
+                if (hasAnyPermissions())
+                    internalGranted(
+                        contract.rawPermissions.filter { hasPermission(it) }
+                            .map { it.normalizePermission() }.toSet()
+                    )
+                else
+                    internalDenied(contract.permissions)
+        }
+    }
 
     private fun internalLaunch() {
-        launcher.launch(contract.permissions.toTypedArray())
+        launch()
     }
 
     private fun internalCancelled() {
@@ -116,6 +123,10 @@ abstract class MultiplePermissionsLauncher(
 
         class AllOf(permissions: Collection<String>) : Contract(permissions.toSet())
         class AnyOf(permissions: Collection<String>) : Contract(permissions.toSet())
+    }
+
+    interface Launcher {
+        fun launch(permissions: Set<String>)
     }
 }
 

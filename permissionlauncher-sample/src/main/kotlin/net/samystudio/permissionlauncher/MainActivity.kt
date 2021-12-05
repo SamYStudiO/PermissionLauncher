@@ -12,14 +12,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import net.samystudio.permissionlauncher.databinding.ActivityMainBinding
 
-
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
+
+    // Permission launcher for Manifest.permission.READ_CONTACTS
     private val contactPermissionLauncher =
         createPermissionLauncher(Manifest.permission.READ_CONTACTS)
+
+    // Permission launcher for any of Manifest.permission.ACCESS_COARSE_LOCATION and Manifest.permission.ACCESS_FINE_LOCATION
     private val locationPermissionLauncher = createMultiplePermissionsLauncher(
         anyOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
     )
+
+    // Permission launcher for all of Manifest.permission.CAMERA and Manifest.permission.WRITE_EXTERNAL_STORAGE
     private val cameraPermissionLauncher = createMultiplePermissionsLauncher(
         allOf(
             Manifest.permission.CAMERA,
@@ -48,7 +53,8 @@ class MainActivity : ComponentActivity() {
                         )
                     ) showDeniedInfo(setOf(Manifest.permission.READ_CONTACTS))
                     updateState()
-                }) {
+                }
+            ) {
                 updateState()
             }
         }
@@ -61,14 +67,15 @@ class MainActivity : ComponentActivity() {
                 },
                 deniedCallback = { set ->
                     if (!set.map {
-                            ActivityCompat.shouldShowRequestPermissionRationale(
+                        ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 it
                             )
-                        }.contains(true)
+                    }.contains(true)
                     ) showDeniedInfo(set)
                     updateState()
-                }) {
+                }
+            ) {
                 updateState()
             }
         }
@@ -81,14 +88,15 @@ class MainActivity : ComponentActivity() {
                 },
                 deniedCallback = { set ->
                     if (!set.map {
-                            ActivityCompat.shouldShowRequestPermissionRationale(
+                        ActivityCompat.shouldShowRequestPermissionRationale(
                                 this,
                                 it
                             )
-                        }.contains(true)
+                    }.contains(true)
                     ) showDeniedInfo(set)
                     updateState()
-                }) {
+                }
+            ) {
                 updateState()
             }
         }
@@ -156,7 +164,7 @@ class MainActivity : ComponentActivity() {
             .setTitle("Rationale")
             .setMessage(
                 "Info about why user should grant permission to ${
-                    permissions.joinToString(" & ") { it.split(".").last() }
+                permissions.joinToString(" & ") { it.split(".").last() }
                 }."
             )
             .setPositiveButton("Accept") { _, _ -> rationalePermissionLauncher.accept() }
@@ -171,7 +179,7 @@ class MainActivity : ComponentActivity() {
             .setTitle("Permission is denied")
             .setMessage(
                 "Info about user has denied ${
-                    permissions.joinToString(" & ") { it.split(".").last() }
+                permissions.joinToString(" & ") { it.split(".").last() }
                 } and need to go to app settings if he has changed his mind."
             )
             .setPositiveButton("Grant") { _, _ -> showAppSettings() }

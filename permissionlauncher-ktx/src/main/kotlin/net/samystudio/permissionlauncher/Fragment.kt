@@ -20,7 +20,7 @@ fun Fragment.hasPermission(permission: String) =
         requireContext(),
         permission
     ) == PackageManager.PERMISSION_GRANTED ||
-            permission.isUselessPermission()
+        permission.isUselessPermission()
 
 /**
  * Convenient way to get if a set of permissions are granted from a [Fragment].

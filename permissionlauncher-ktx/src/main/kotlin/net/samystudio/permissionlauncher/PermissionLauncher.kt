@@ -2,15 +2,9 @@
 
 package net.samystudio.permissionlauncher
 
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-
 /**
  * A permission launcher for a unique permission. For multiple permissions use
  * [MultiplePermissionsLauncher].
- *
- * @see ActivityResultContracts.RequestPermission
  */
 abstract class PermissionLauncher(
     /**
@@ -24,18 +18,11 @@ abstract class PermissionLauncher(
 ) {
     private var deniedCallback: ((permission: String) -> Unit)? = null
     private var grantedCallback: ((permission: String) -> Unit)? = null
-    protected abstract val launcher: ActivityResultLauncher<String>
-    protected val activityResultCallback = ActivityResultCallback<Boolean> { granted ->
-        if (granted)
-            internalGranted()
-        else
-            internalDenied()
-    }
     private val rationalePermissionLauncher by lazy {
         RationalePermissionLauncher(
             ::internalCancelled,
             ::internalDenied,
-        ) { internalLaunch() }
+        ) { launch() }
     }
 
     /**
@@ -67,15 +54,19 @@ abstract class PermissionLauncher(
             shouldShowRequestPermissionRationale() ->
                 rationaleCallback?.invoke(permission, rationalePermissionLauncher)
             else ->
-                internalLaunch()
+                launch()
         }
     }
 
     protected abstract fun hasPermission(): Boolean
     protected abstract fun shouldShowRequestPermissionRationale(): Boolean
+    protected abstract fun launch()
 
-    private fun internalLaunch() {
-        launcher.launch(permission)
+    protected fun handleResult(granted: Boolean) {
+        if (granted)
+            internalGranted()
+        else
+            internalDenied()
     }
 
     private fun internalCancelled() {
@@ -93,5 +84,9 @@ abstract class PermissionLauncher(
         grantedCallback?.invoke(permission)
         deniedCallback = null
         grantedCallback = null
+    }
+
+    interface Launcher {
+        fun launch(permission: String)
     }
 }
