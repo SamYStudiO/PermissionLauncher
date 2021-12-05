@@ -16,7 +16,7 @@ abstract class PermissionLauncher(
      */
     protected val rawPermission: String,
 ) {
-    private var deniedCallback: ((permission: String) -> Unit)? = null
+    private var deniedCallback: ((permission: String, neverAskAgain: Boolean) -> Unit)? = null
     private var grantedCallback: ((permission: String) -> Unit)? = null
     private val rationalePermissionLauncher by lazy {
         RationalePermissionLauncher(
@@ -42,7 +42,7 @@ abstract class PermissionLauncher(
      */
     fun launch(
         rationaleCallback: ((permission: String, RationalePermissionLauncher) -> Unit)? = null,
-        deniedCallback: ((permission: String) -> Unit)? = null,
+        deniedCallback: ((permission: String, neverAskAgain: Boolean) -> Unit)? = null,
         grantedCallback: (permission: String) -> Unit,
     ) {
         this.deniedCallback = deniedCallback
@@ -75,7 +75,7 @@ abstract class PermissionLauncher(
     }
 
     private fun internalDenied() {
-        deniedCallback?.invoke(permission)
+        deniedCallback?.invoke(permission, shouldShowRequestPermissionRationale())
         deniedCallback = null
         grantedCallback = null
     }

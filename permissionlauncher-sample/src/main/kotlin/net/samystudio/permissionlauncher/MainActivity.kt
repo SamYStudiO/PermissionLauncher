@@ -46,12 +46,10 @@ class MainActivity : ComponentActivity() {
                     showRationale(setOf(permission), rationalePermissionLauncher)
                     updateState()
                 },
-                deniedCallback = {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                            this,
-                            Manifest.permission.READ_CONTACTS
-                        )
-                    ) showDeniedInfo(setOf(Manifest.permission.READ_CONTACTS))
+                deniedCallback = { permission, neverAskAgain ->
+                    if (neverAskAgain)
+                        showDeniedInfo(setOf(permission))
+
                     updateState()
                 }
             ) {
@@ -65,14 +63,10 @@ class MainActivity : ComponentActivity() {
                     showRationale(permissions, rationalePermissionLauncher)
                     updateState()
                 },
-                deniedCallback = { set ->
-                    if (!set.map {
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                this,
-                                it
-                            )
-                    }.contains(true)
-                    ) showDeniedInfo(set)
+                deniedCallback = { permissions, neverAskAgain ->
+                    if (neverAskAgain)
+                        showDeniedInfo(permissions)
+
                     updateState()
                 }
             ) {
@@ -86,14 +80,10 @@ class MainActivity : ComponentActivity() {
                     showRationale(permissions, rationalePermissionLauncher)
                     updateState()
                 },
-                deniedCallback = { set ->
-                    if (!set.map {
-                        ActivityCompat.shouldShowRequestPermissionRationale(
-                                this,
-                                it
-                            )
-                    }.contains(true)
-                    ) showDeniedInfo(set)
+                deniedCallback = { permissions, neverAskAgain ->
+                    if (neverAskAgain)
+                        showDeniedInfo(permissions)
+
                     updateState()
                 }
             ) {

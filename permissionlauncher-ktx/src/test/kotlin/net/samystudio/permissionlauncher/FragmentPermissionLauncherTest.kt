@@ -21,7 +21,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -29,7 +29,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission", "world_permission"), permissions)
     }
@@ -57,7 +57,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -65,7 +65,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission", "world_permission"), permissions)
     }
@@ -86,7 +86,7 @@ class FragmentPermissionLauncherTest {
             { perms, _ ->
                 permissions = perms
             }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = {}
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -94,7 +94,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 1) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -120,7 +120,8 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = { permissions = it }
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit =
+            { perms, _ -> permissions = perms }
         val granted: (permissions: Set<String>) -> Unit = {}
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -128,7 +129,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 1) { deniedSpy.invoke(any()) }
+        verify(exactly = 1) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -147,7 +148,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -155,7 +156,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -183,7 +184,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -191,7 +192,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -212,7 +213,7 @@ class FragmentPermissionLauncherTest {
             { perms, _ ->
                 permissions = perms
             }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = {}
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -220,7 +221,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 1) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -238,7 +239,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = {}
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -246,7 +247,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -276,7 +277,7 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = { }
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permissions: Set<String>) -> Unit = { permissions = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -284,7 +285,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission"), permissions)
     }
@@ -310,7 +311,8 @@ class FragmentPermissionLauncherTest {
 
         var permissions: Set<String> = emptySet()
         val rationale: (permissions: Set<String>, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permissions: Set<String>) -> Unit = { permissions = it }
+        val denied: (permissions: Set<String>, neverAskAgain: Boolean) -> Unit =
+            { perms, _ -> permissions = perms }
         val granted: (permissions: Set<String>) -> Unit = { }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -318,7 +320,7 @@ class FragmentPermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 1) { deniedSpy.invoke(any()) }
+        verify(exactly = 1) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals(setOf("hello_permission", "world_permission"), permissions)
     }

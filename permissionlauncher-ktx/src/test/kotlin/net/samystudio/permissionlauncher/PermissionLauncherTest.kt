@@ -17,7 +17,7 @@ class PermissionLauncherTest {
 
         var permission = ""
         val rationale: (permission: String, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permission: String) -> Unit = {}
+        val denied: (permission: String, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permission: String) -> Unit = { permission = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -25,7 +25,7 @@ class PermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals("hello_permission", permission)
     }
@@ -43,7 +43,7 @@ class PermissionLauncherTest {
 
         var permission = ""
         val rationale: (permission: String, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permission: String) -> Unit = {}
+        val denied: (permission: String, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permission: String) -> Unit = { permission = it }
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -51,7 +51,7 @@ class PermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 1) { grantedSpy.invoke(any()) }
         Assert.assertEquals("hello_permission", permission)
     }
@@ -67,7 +67,7 @@ class PermissionLauncherTest {
         var permission = ""
         val rationale: (permission: String, RationalePermissionLauncher) -> Unit =
             { perm, _ -> permission = perm }
-        val denied: (permission: String) -> Unit = {}
+        val denied: (permission: String, neverAskAgain: Boolean) -> Unit = { _, _ -> }
         val granted: (permission: String) -> Unit = {}
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -75,7 +75,7 @@ class PermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 1) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 0) { deniedSpy.invoke(any()) }
+        verify(exactly = 0) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals("hello_permission", permission)
     }
@@ -93,7 +93,8 @@ class PermissionLauncherTest {
 
         var permission = ""
         val rationale: (permission: String, RationalePermissionLauncher) -> Unit = { _, _ -> }
-        val denied: (permission: String) -> Unit = { permission = it }
+        val denied: (permission: String, neverAskAgain: Boolean) -> Unit =
+            { perm, _ -> permission = perm }
         val granted: (permission: String) -> Unit = {}
         val rationaleSpy = spyk(rationale)
         val deniedSpy = spyk(denied)
@@ -101,7 +102,7 @@ class PermissionLauncherTest {
         testLauncher.launch(rationaleSpy, deniedSpy, grantedSpy)
 
         verify(exactly = 0) { rationaleSpy.invoke(any(), any()) }
-        verify(exactly = 1) { deniedSpy.invoke(any()) }
+        verify(exactly = 1) { deniedSpy.invoke(any(), any()) }
         verify(exactly = 0) { grantedSpy.invoke(any()) }
         Assert.assertEquals("hello_permission", permission)
     }

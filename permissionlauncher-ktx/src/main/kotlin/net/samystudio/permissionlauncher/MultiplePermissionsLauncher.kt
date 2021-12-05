@@ -17,7 +17,7 @@ abstract class MultiplePermissionsLauncher(
      */
     protected val contract: Contract,
 ) {
-    private var deniedCallback: ((permissions: Set<String>) -> Unit)? = null
+    private var deniedCallback: ((permissions: Set<String>, neverAskAgain: Boolean) -> Unit)? = null
     private var grantedCallback: ((permissions: Set<String>) -> Unit)? = null
     private var rationalePermissionLauncher: RationalePermissionLauncher? = null
     val permissions = contract.permissions
@@ -34,7 +34,7 @@ abstract class MultiplePermissionsLauncher(
      */
     fun launch(
         rationaleCallback: ((permissions: Set<String>, RationalePermissionLauncher) -> Unit)? = null,
-        deniedCallback: ((permissions: Set<String>) -> Unit)? = null,
+        deniedCallback: ((permissions: Set<String>, neverAskAgain: Boolean) -> Unit)? = null,
         grantedCallback: (permissions: Set<String>) -> Unit,
     ) {
         this.deniedCallback = deniedCallback
@@ -55,7 +55,7 @@ abstract class MultiplePermissionsLauncher(
             rationales.isNotEmpty() -> {
                 rationalePermissionLauncher = RationalePermissionLauncher(
                     ::internalCancelled,
-                    { internalDenied(rationales) },
+                    { internalDenied(rationales, false) },
                 ) { internalLaunch() }
                 rationaleCallback?.invoke(rationales, rationalePermissionLauncher!!)
             }
@@ -79,7 +79,10 @@ abstract class MultiplePermissionsLauncher(
                             .map { it.normalizePermission() }.toSet()
                     )
                 else
-                    internalDenied(map.filter { !it.value }.keys.toSet())
+                    internalDenied(
+                        map.filter { !it.value }.keys.toSet(),
+                        shouldShowRequestPermissionRationales().isEmpty()
+                    )
             is Contract.AnyOf ->
                 if (hasAnyPermissions())
                     internalGranted(
@@ -87,7 +90,10 @@ abstract class MultiplePermissionsLauncher(
                             .map { it.normalizePermission() }.toSet()
                     )
                 else
-                    internalDenied(contract.permissions)
+                    internalDenied(
+                        contract.permissions,
+                        shouldShowRequestPermissionRationales().isEmpty()
+                    )
         }
     }
 
@@ -101,8 +107,8 @@ abstract class MultiplePermissionsLauncher(
         rationalePermissionLauncher = null
     }
 
-    private fun internalDenied(permissions: Set<String>) {
-        deniedCallback?.invoke(permissions)
+    private fun internalDenied(permissions: Set<String>, neverAskAgain: Boolean) {
+        deniedCallback?.invoke(permissions, neverAskAgain)
         deniedCallback = null
         grantedCallback = null
         rationalePermissionLauncher = null
