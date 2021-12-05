@@ -81,8 +81,9 @@ Check [sample](https://github.com/SamYStudiO/PermissionLauncher/tree/master/perm
 
 Download
 --------
-YET TO BE RELEASED (WORK IN PROGRESS)
-
+```groovy
+implementation 'net.samystudio.permissionlauncher:permissionlauncher-ktx:0.9.0'
+```
 
 Snapshots are available from [Sonatype's snapshots repository](https://oss.sonatype.org/content/repositories/snapshots/).
 If you want to run latest snapshot add its repository from your root `build.gradle`:
@@ -98,7 +99,7 @@ allprojects {
 ```
 and change versions:
 ```groovy
-implementation 'net.samystudio.permissionlauncher:permissionlauncher-ktx:0.1-SNAPSHOT'
+implementation 'net.samystudio.permissionlauncher:permissionlauncher-ktx:0.9.1-SNAPSHOT'
 ```
 
 Publishing
@@ -108,7 +109,7 @@ Publishing
  2. Update the `CHANGELOG.md` for the impending release.
  3. Update the `README.md` with the new version.
  4. `git commit -am "Prepare for release X.Y.Z"` (where X.Y.Z is the new version)
- 5. `./gradlew uploadArchives --no-daemon --no-parallel`
+ 5. `./gradlew publish --no-daemon --no-parallel`
  6. `git tag -a X.Y.Z -m "Version X.Y.Z"` (where X.Y.Z is the new version)
  7. Update the `gradle.properties` to the next SNAPSHOT version.
  8. `git commit -am "Prepare next development version"`
