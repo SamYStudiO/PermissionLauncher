@@ -2,8 +2,6 @@
 
 package net.samystudio.permissionlauncher
 
-import android.Manifest
-import android.os.Build
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,29 +13,17 @@ import androidx.activity.result.contract.ActivityResultContracts
  * @see ActivityResultContracts.RequestPermission
  */
 abstract class PermissionLauncher(
-    val permission: String,
     /**
-     * A maximum Sdk version this permission should be launched, for example asking
-     * [Manifest.permission.WRITE_EXTERNAL_STORAGE] may be useless after [Build.VERSION_CODES.P].
+     * Permission you want to request.
+     * You may specified directly [maxSdkVersion] for this permission using the following :
+     * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+     * For user running P or later launching permission request will always return permission as
+     * granted.
      */
-    private val maxSdk: Int? = null,
-    /**
-     * A optional rationale callback called everytime this launcher is launched and a rationale
-     * should be present to user.
-     */
-    private val globalRationale: ((RationalePermissionLauncher) -> Unit)? = null,
-    /**
-     * A optional denied callback called everytime this launcher is launched and failed.
-     */
-    private val globalDenied: (() -> Unit)? = null,
-    /**
-     * A optional success callback called everytime this launcher is launched and succeeded.
-     */
-    private val globalSuccess: (() -> Unit)? = null,
+    protected val rawPermission: String,
 ) {
-    private var localRationale: ((RationalePermissionLauncher) -> Boolean)? = null
-    private var localDenied: (() -> Boolean)? = null
-    private var localGranted: (() -> Boolean)? = null
+    private var deniedCallback: ((permission: String) -> Unit)? = null
+    private var grantedCallback: ((permission: String) -> Unit)? = null
     protected abstract val launcher: ActivityResultLauncher<String>
     protected val activityResultCallback = ActivityResultCallback<Boolean> { granted ->
         if (granted)
@@ -45,68 +31,67 @@ abstract class PermissionLauncher(
         else
             internalDenied()
     }
-    private val rationalePermissionLauncher = RationalePermissionLauncher(
-        ::internalLaunch,
-        ::internalDenied,
-    )
+    private val rationalePermissionLauncher by lazy {
+        RationalePermissionLauncher(
+            ::internalCancelled,
+            ::internalDenied,
+        ) { internalLaunch() }
+    }
+
+    /**
+     * Requested permission.
+     */
+    val permission = rawPermission.normalizePermission()
 
     /**
      * Start permission request with optional specified callbacks.
      *
-     * @param rationale A optional rationale callback called for this specific launch when this
-     * launcher is launched and a rationale should be present to user. Return true to call global
-     * listener as well ([globalRationale]) or false to ignore global listener.
-     * @param denied A optional denied callback called for this specific launch when this launcher
-     * failed. Return true to call global listener as well ([globalDenied]) or false to ignore
-     * global listener.
-     * @param granted A optional success callback called for this specific launch when this launcher
-     * succeeded. Return true to call global listener as well ([globalSuccess]) or false to ignore
-     * global listener.
+     * @param rationaleCallback A optional rationale callback called for this specific launch when this
+     * launcher is launched and a rationale should be present to user.
+     * @param deniedCallback A optional denied callback called for this specific launch when this launcher
+     * failed.
+     * @param grantedCallback A success callback called for this specific launch when this launcher
+     * succeeded.
      */
     fun launch(
-        rationale: ((RationalePermissionLauncher) -> Boolean)? = null,
-        denied: (() -> Boolean)? = null,
-        granted: (() -> Boolean)? = null,
+        rationaleCallback: ((permission: String, RationalePermissionLauncher) -> Unit)? = null,
+        deniedCallback: ((permission: String) -> Unit)? = null,
+        grantedCallback: (permission: String) -> Unit,
     ) {
-        this.localRationale = rationale
-        this.localDenied = denied
-        this.localGranted = granted
+        this.deniedCallback = deniedCallback
+        this.grantedCallback = grantedCallback
 
         when {
-            hasPermission() || (maxSdk != null && Build.VERSION.SDK_INT > maxSdk) ->
+            hasPermission() ->
                 internalGranted()
             shouldShowRequestPermissionRationale() ->
-                internalRationale()
+                rationaleCallback?.invoke(permission, rationalePermissionLauncher)
             else ->
                 internalLaunch()
         }
     }
 
-    protected abstract fun shouldShowRequestPermissionRationale(): Boolean
     protected abstract fun hasPermission(): Boolean
+    protected abstract fun shouldShowRequestPermissionRationale(): Boolean
 
     private fun internalLaunch() {
         launcher.launch(permission)
     }
 
-    private fun internalRationale() {
-        localRationale?.invoke(rationalePermissionLauncher).let {
-            if (it != false)
-                globalRationale?.invoke(rationalePermissionLauncher)
-        }
+    private fun internalCancelled() {
+        deniedCallback = null
+        grantedCallback = null
     }
 
     private fun internalDenied() {
-        localDenied?.invoke().let {
-            if (it != false)
-                globalDenied?.invoke()
-        }
+        deniedCallback?.invoke(permission)
+        deniedCallback = null
+        grantedCallback = null
     }
 
     private fun internalGranted() {
-        localGranted?.invoke().let {
-            if (it != false)
-                globalSuccess?.invoke()
-        }
+        grantedCallback?.invoke(permission)
+        deniedCallback = null
+        grantedCallback = null
     }
 }

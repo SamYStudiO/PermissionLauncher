@@ -8,19 +8,45 @@ import androidx.fragment.app.Fragment
 
 /**
  * Convenient way to get if a [permission] is granted from an [Fragment].
+ * You may specified [maxSdkVersion] for this permission, for example :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * In this case users running P or later will be considered as [PackageManager.PERMISSION_GRANTED]
+ * and result will be true.
+ * If you omit [maxSdkVersion] and have specified maxSdkVersion from your manifest then Android will
+ * consider this as [PackageManager.PERMISSION_DENIED] and result will be false.
  */
 fun Fragment.hasPermission(permission: String) =
     ContextCompat.checkSelfPermission(
         requireContext(),
         permission
-    ) == PackageManager.PERMISSION_GRANTED
+    ) == PackageManager.PERMISSION_GRANTED ||
+            permission.isUselessPermission()
 
 /**
  * Convenient way to get if a set of permissions are granted from a [Fragment].
  * All [permissions] need to be granted to get this returns true.
+ * You may specified [maxSdkVersion] for these permissions, for example :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * In this case users running P or later will be considered as [PackageManager.PERMISSION_GRANTED]
+ * and result will be true.
+ * If you omit [maxSdkVersion] and have specified maxSdkVersion from your manifest then Android will
+ * consider this as [PackageManager.PERMISSION_DENIED] and result will be false.
  */
-fun Fragment.hasPermissions(vararg permissions: String) =
+fun Fragment.hasAllPermissions(vararg permissions: String) =
     permissions.map { hasPermission(it) }.none { !it }
+
+/**
+ * Convenient way to get if a set of permissions are granted from a [Fragment].
+ * At least one of [permissions] need to be granted to get this returns true.
+ * You may specified [maxSdkVersion] for these permissions, for example :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * In this case users running P or later will be considered as [PackageManager.PERMISSION_GRANTED]
+ * and result will be true.
+ * If you omit [maxSdkVersion] and have specified maxSdkVersion from your manifest then Android will
+ * consider this as [PackageManager.PERMISSION_DENIED] and result may be false.
+ */
+fun Fragment.hasAnyPermissions(vararg permissions: String) =
+    permissions.map { hasPermission(it) }.any { it }
 
 /**
  * Convenient way to create a [PermissionLauncher] from current [Fragment].
@@ -29,17 +55,9 @@ fun Fragment.hasPermissions(vararg permissions: String) =
  */
 fun Fragment.createPermissionLauncher(
     permission: String,
-    maxSdkInt: Int? = null,
-    globalRationale: ((RationalePermissionLauncher) -> Unit)? = null,
-    globalDenied: (() -> Unit)? = null,
-    globalGranted: (() -> Unit)? = null,
 ): PermissionLauncher = FragmentPermissionLauncher(
     this,
     permission,
-    maxSdkInt,
-    globalRationale,
-    globalDenied,
-    globalGranted,
 )
 
 /**
@@ -48,16 +66,8 @@ fun Fragment.createPermissionLauncher(
  * @see [FragmentMultiplePermissionsLauncher]
  */
 fun Fragment.createMultiplePermissionsLauncher(
-    permissions: Set<String>,
-    maxSdks: Set<Pair<String, Int>>? = null,
-    globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
-    globalDenied: ((Set<String>) -> Unit)? = null,
-    globalGranted: (() -> Unit)? = null,
+    multiplePermissionsContract: MultiplePermissionsLauncher.Contract,
 ): MultiplePermissionsLauncher = FragmentMultiplePermissionsLauncher(
     this,
-    permissions,
-    maxSdks,
-    globalRationale,
-    globalDenied,
-    globalGranted,
+    multiplePermissionsContract,
 )

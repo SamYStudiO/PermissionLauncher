@@ -11,29 +11,28 @@ import androidx.core.app.ActivityCompat
  */
 class ActivityMultiplePermissionsLauncher(
     private val activity: ComponentActivity,
-    permissions: Set<String>,
-    maxSdks: Set<Pair<String, Int>>? = null,
-    globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
-    globalDenied: ((Set<String>) -> Unit)? = null,
-    globalGranted: (() -> Unit)? = null,
-) : MultiplePermissionsLauncher(
-    permissions,
-    maxSdks,
-    globalRationale,
-    globalDenied,
-    globalGranted,
-) {
+    contract: Contract,
+) : MultiplePermissionsLauncher(contract) {
     override val launcher =
         activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
             activityResultCallback
         )
 
-    override fun shouldShowRequestPermissionRationales(): Set<String> =
-        permissions.filter {
-            ActivityCompat.shouldShowRequestPermissionRationale(activity, it)
-        }.toSet()
+    override fun hasPermission(permission: String) =
+        activity.hasPermission(permission)
 
-    override fun hasPermissions() =
-        activity.hasPermissions(*requiredPermission.toTypedArray())
+    override fun hasAllPermissions() =
+        activity.hasAllPermissions(*contract.rawPermissions.toTypedArray())
+
+    override fun hasAnyPermissions() =
+        activity.hasAnyPermissions(*contract.rawPermissions.toTypedArray())
+
+    override fun shouldShowRequestPermissionRationales() =
+        contract.permissions.filter {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                activity,
+                it
+            )
+        }.toSet()
 }

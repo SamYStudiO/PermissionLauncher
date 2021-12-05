@@ -10,27 +10,23 @@ import androidx.fragment.app.Fragment
  */
 class FragmentMultiplePermissionsLauncher(
     private val fragment: Fragment,
-    permissions: Set<String>,
-    maxSdks: Set<Pair<String, Int>>? = null,
-    globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
-    globalDenied: ((Set<String>) -> Unit)? = null,
-    globalGranted: (() -> Unit)? = null,
-) : MultiplePermissionsLauncher(
-    permissions,
-    maxSdks,
-    globalRationale,
-    globalDenied,
-    globalGranted,
-) {
+    contract: Contract,
+) : MultiplePermissionsLauncher(contract) {
     override val launcher =
         fragment.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
             activityResultCallback
         )
 
-    override fun shouldShowRequestPermissionRationales(): Set<String> =
-        permissions.filter { fragment.shouldShowRequestPermissionRationale(it) }.toSet()
+    override fun hasPermission(permission : String) =
+        fragment.hasPermission(permission)
 
-    override fun hasPermissions() =
-        fragment.hasPermissions(*requiredPermission.toTypedArray())
+    override fun hasAllPermissions() =
+        fragment.hasAllPermissions(*contract.rawPermissions.toTypedArray())
+
+    override fun hasAnyPermissions() =
+        fragment.hasAnyPermissions(*contract.rawPermissions.toTypedArray())
+
+    override fun shouldShowRequestPermissionRationales() =
+        contract.permissions.filter { fragment.shouldShowRequestPermissionRationale(it) }.toSet()
 }

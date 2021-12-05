@@ -1,12 +1,11 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package net.samystudio.permissionlauncher
 
-import android.Manifest
-import android.os.Build
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import net.samystudio.permissionlauncher.MultiplePermissionsLauncher.Contract
 
 /**
  * A permission launcher for multiples permissions.
@@ -14,110 +13,148 @@ import androidx.activity.result.contract.ActivityResultContracts
  * @see ActivityResultContracts.RequestMultiplePermissions
  */
 abstract class MultiplePermissionsLauncher(
-    val permissions: Set<String>,
     /**
-     * A maximum Sdk version as [Pair.second] for each permission as [Pair.first], for example
-     * asking [Manifest.permission.WRITE_EXTERNAL_STORAGE] may be useless after
-     * [Build.VERSION_CODES.P]. If the permission from [Pair.first] is not present from
-     * [permissions] set it will be ignore.
+     * Permissions you want to request.
+     * @see Contract
      */
-    private val maxSdks: Set<Pair<String, Int>>? = null,
-    /**
-     * A optional rationale callback called everytime this launcher is launched and a rationale
-     * should be present to user.
-     */
-    private val globalRationale: ((Set<String>, RationalePermissionLauncher) -> Unit)? = null,
-    /**
-     * A optional denied callback called everytime this launcher is launched and failed.
-     */
-    private val globalDenied: ((Set<String>) -> Unit)? = null,
-    /**
-     * A optional success callback called everytime this launcher is launched and succeeded.
-     */
-    private val globalGranted: (() -> Unit)? = null,
+    protected val contract: Contract,
 ) {
-    private var permissionsWithMaxSdk: Set<Pair<String, Int>>? = null
-    private var localRationale: ((Set<String>, RationalePermissionLauncher) -> Boolean)? =
-        null
-    private var localDenied: ((Set<String>) -> Boolean)? = null
-    private var localGranted: (() -> Boolean)? = null
+    private var deniedCallback: ((permissions: Set<String>) -> Unit)? = null
+    private var grantedCallback: ((permissions: Set<String>) -> Unit)? = null
     protected abstract val launcher: ActivityResultLauncher<Array<String>>
-    protected val requiredPermission = permissions.filterNot { permission ->
-        maxSdks?.find { it.first == permission && Build.VERSION.SDK_INT > it.second } != null
-    }.toSet()
     protected val activityResultCallback = ActivityResultCallback<Map<String, Boolean>> { map ->
-        if (map.filter { !it.value }.isEmpty()) {
-            internalGranted()
-        } else
-            map.filter { !it.value }.map { it.key }.toSet().let { set ->
-                if (set.isNotEmpty())
-                    internalDenied(set)
-            }
+        when (contract) {
+            is Contract.AllOf ->
+                if (hasAllPermissions())
+                    internalGranted(map.keys.toSet())
+                else
+                    internalDenied(map.filter { !it.value }.keys.toSet())
+            is Contract.AnyOf ->
+                if (hasAnyPermissions())
+                    internalGranted(map.filter { it.value }.keys.toSet())
+                else
+                    internalDenied(map.keys.toSet())
+        }
     }
+    private var rationalePermissionLauncher: RationalePermissionLauncher? = null
+    val permissions = contract.permissions
 
     /**
      * Start permission request with optional specified callbacks.
      *
-     * @param rationale A optional rationale callback called for this specific launch when this
-     * launcher is launched and a rationale should be present to user. Return true to call global
-     * listener as well ([globalRationale]) or false to ignore global listener.
-     * @param denied A optional denied callback called for this specific launch when this launcher
-     * failed. Return true to call global listener as well ([globalDenied]) or false to ignore
-     * global listener.
-     * @param granted A optional success callback called for this specific launch when this launcher
-     * succeeded. Return true to call global listener as well ([globalGranted]) or false to ignore
-     * global listener.
+     * @param rationaleCallback A optional rationale callback called for this specific launch when
+     * this launcher is launched and a rationale should be present to user.
+     * @param deniedCallback A optional denied callback called for this specific launch when this
+     * launcher failed.
+     * @param grantedCallback A success callback called for this specific launch when this launcher
+     * succeeded.
      */
     fun launch(
-        rationale: ((Set<String>, RationalePermissionLauncher) -> Boolean)? = null,
-        denied: ((Set<String>) -> Boolean)? = null,
-        granted: (() -> Boolean)? = null,
+        rationaleCallback: ((permissions: Set<String>, RationalePermissionLauncher) -> Unit)? = null,
+        deniedCallback: ((permissions: Set<String>) -> Unit)? = null,
+        grantedCallback: (permissions: Set<String>) -> Unit,
     ) {
-        this.localRationale = rationale
-        this.localDenied = denied
-        this.localGranted = granted
+        this.deniedCallback = deniedCallback
+        this.grantedCallback = grantedCallback
 
+        val hasPermissions = when (contract) {
+            is Contract.AllOf -> hasAllPermissions()
+            is Contract.AnyOf -> hasAnyPermissions()
+        }
         val rationales = shouldShowRequestPermissionRationales()
 
         when {
-            hasPermissions() ->
-                internalGranted()
-            rationales.isNotEmpty() ->
-                internalRationale(rationales)
+            hasPermissions ->
+                internalGranted(contract.rawPermissions.filter { hasPermission(it) }
+                    .map { it.normalizePermission() }.toSet())
+            rationales.isNotEmpty() -> {
+                rationalePermissionLauncher = RationalePermissionLauncher(
+                    ::internalCancelled,
+                    { internalDenied(rationales) },
+                ) { internalLaunch() }
+                rationaleCallback?.invoke(rationales, rationalePermissionLauncher!!)
+            }
             else ->
                 internalLaunch()
         }
     }
 
+    protected abstract fun hasPermission(permission: String): Boolean
+    protected abstract fun hasAllPermissions(): Boolean
+    protected abstract fun hasAnyPermissions(): Boolean
     protected abstract fun shouldShowRequestPermissionRationales(): Set<String>
-    protected abstract fun hasPermissions(): Boolean
 
     private fun internalLaunch() {
-        launcher.launch(permissions.toTypedArray())
+        launcher.launch(contract.permissions.toTypedArray())
     }
 
-    private fun internalRationale(permissions: Set<String>) {
-        val rationaleMultiplePermissionsLauncher = RationalePermissionLauncher(
-            ::internalLaunch
-        ) { internalDenied(permissions) }
-
-        localRationale?.invoke(permissions, rationaleMultiplePermissionsLauncher).let {
-            if (it != false)
-                globalRationale?.invoke(permissions, rationaleMultiplePermissionsLauncher)
-        }
+    private fun internalCancelled() {
+        deniedCallback = null
+        grantedCallback = null
+        rationalePermissionLauncher = null
     }
 
     private fun internalDenied(permissions: Set<String>) {
-        localDenied?.invoke(permissions).let {
-            if (it != false)
-                globalDenied?.invoke(permissions)
-        }
+        deniedCallback?.invoke(permissions)
+        deniedCallback = null
+        grantedCallback = null
+        rationalePermissionLauncher = null
     }
 
-    private fun internalGranted() {
-        localGranted?.invoke().let {
-            if (it != false)
-                globalGranted?.invoke()
-        }
+    private fun internalGranted(permissions: Set<String>) {
+        grantedCallback?.invoke(permissions)
+        deniedCallback = null
+        grantedCallback = null
+        rationalePermissionLauncher = null
+    }
+
+    /**
+     * Internal usage or for Java users. Kotlin users should always use [allOf] or [anyOf] instead.
+     */
+    sealed class Contract(val rawPermissions: Set<String>) {
+        val permissions = rawPermissions.map { it.normalizePermission() }.toSet()
+
+        class AllOf(permissions: Collection<String>) : Contract(permissions.toSet())
+        class AnyOf(permissions: Collection<String>) : Contract(permissions.toSet())
     }
 }
+
+/**
+ * Build a [Contract] with all of the specified permissions required.
+ * @param permissions Permissions you want to request.
+ * You may specified directly [maxSdkVersion] for these permissions using the following :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * For user running P or later launching permission request will always return permission as
+ * granted.
+ */
+fun allOf(permissions: Collection<String>): Contract = Contract.AllOf(permissions)
+
+/**
+ * Build a [Contract] with all of the specified permissions required.
+ * @param permissions Permissions you want to request.
+ * You may specified directly [maxSdkVersion] for these permissions using the following :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * For user running P or later launching permission request will always return permission as
+ * granted.
+ */
+fun allOf(vararg permissions: String): Contract = Contract.AllOf(permissions.toSet())
+
+/**
+ * Build a [Contract] with at least one of the specified permissions required.
+ * @param permissions Permissions you want to request.
+ * You may specified directly [maxSdkVersion] for these permissions using the following :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * For user running P or later launching permission request will always return permission as
+ * granted.
+ */
+fun anyOf(permissions: Collection<String>): Contract = Contract.AnyOf(permissions)
+
+/**
+ * Build a [Contract] with at least one of the specified permissions required.
+ * @param permissions Permissions you want to request.
+ * You may specified directly [maxSdkVersion] for these permissions using the following :
+ * <code>Manifest.Permission.WRITE_EXTERNAL_STORAGE maxSdkVersion Build.VERSION_CODES.P</code>
+ * For user running P or later launching permission request will always return permission as
+ * granted.
+ */
+fun anyOf(vararg permissions: String): Contract = Contract.AnyOf(permissions.toSet())

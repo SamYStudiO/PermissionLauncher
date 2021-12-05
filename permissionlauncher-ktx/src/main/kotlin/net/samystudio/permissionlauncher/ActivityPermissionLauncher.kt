@@ -12,26 +12,16 @@ import androidx.core.app.ActivityCompat
 class ActivityPermissionLauncher(
     private val activity: ComponentActivity,
     permission: String,
-    maxSdk: Int? = null,
-    globalRationale: ((RationalePermissionLauncher) -> Unit)? = null,
-    globalDenied: (() -> Unit)? = null,
-    globalGranted: (() -> Unit)? = null,
-) : PermissionLauncher(
-    permission,
-    maxSdk,
-    globalRationale,
-    globalDenied,
-    globalGranted,
-) {
+) : PermissionLauncher(permission) {
     override val launcher =
         activity.registerForActivityResult(
             ActivityResultContracts.RequestPermission(),
             activityResultCallback
         )
 
+    override fun hasPermission() =
+        activity.hasPermission(rawPermission)
+
     override fun shouldShowRequestPermissionRationale(): Boolean =
         ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
-
-    override fun hasPermission() =
-        activity.hasPermission(permission)
 }
