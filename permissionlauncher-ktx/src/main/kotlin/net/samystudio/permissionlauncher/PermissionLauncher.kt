@@ -33,10 +33,10 @@ abstract class PermissionLauncher(
     /**
      * Start permission request with optional specified callbacks.
      *
-     * @param rationaleCallback A optional rationale callback called for this specific launch when this
-     * launcher is launched and a rationale should be present to user.
-     * @param deniedCallback A optional denied callback called for this specific launch when this launcher
-     * failed.
+     * @param rationaleCallback A optional rationale callback called for this specific launch when
+     * this launcher is launched and a rationale should be present to user.
+     * @param deniedCallback A optional denied callback called for this specific launch when this
+     * launcher failed.
      * @param grantedCallback A success callback called for this specific launch when this launcher
      * succeeded.
      */

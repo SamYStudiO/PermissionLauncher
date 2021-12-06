@@ -114,7 +114,7 @@ Publishing
  7. Update the `gradle.properties` to the next SNAPSHOT version.
  8. `git commit -am "Prepare next development version"`
  9. `git push && git push --tags`
- 10. `./gradlew closeAndReleaseRepository` or visit [Sonatype Nexus](https://oss.sonatype.org/) and promote the artifact.
+ 10. `./gradlew closeAndReleaseRepository` or visit [Sonatype Nexus](https://s01.oss.sonatype.org/) and promote the artifact.
 
 License
 -------
